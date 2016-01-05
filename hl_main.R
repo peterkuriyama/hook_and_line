@@ -6,6 +6,13 @@ source('R/hl_startup.R')
 
 head(dat)
 
+#Most caugh species are
+dat %>% group_by(ComName, Year) %>% summarise(nfish = length(Length.cm)) %>% 
+  as.data.frame %>% group_by(ComName) %>% summarise(avg.nfish = round(mean(nfish), digits = 0)) %>%
+  arrange(desc = avg.nfish) %>% as.data.frame()
+
+#Most caught species are vermilion, bocaccio, greenspotted rockfish
+
 #What are the things of interest
 # cpue
 # Most caught species / species distributions
@@ -18,6 +25,13 @@ head(dat)
 # Site
 # Drop 
 # Hook Location
+
+#----------------------------------------------------------------------------------------------------
+#What years caught the most bocaccio?
+  #2004 was high, low was in 2010
+dat %>% group_by(Year) %>% summarise(numboc = sum(NumBoc), nhooks = length(SetID), 
+  cpue = numboc / nhooks) %>% ggplot(aes(x = Year, y = cpue)) + geom_point() + theme_bw()
+
 
 #----------------------------------------------------------------------------------------------------
 #Which hooks catch the most fish?
@@ -40,11 +54,20 @@ dat %>% group_by(GenLoc, HookNum) %>% summarise(nfish = length(which(catch == 'y
           cpue = nfish / nhooks) %>% 
 ggplot(aes(x = HookNum, y = cpue)) + geom_point() + facet_wrap(~ GenLoc)
 
+
 #----------------------------------------------------------------------------------------------------
-#Are certain species caught more on certain hooks?
+#Which hooks catch the most bocaccio?
+dat %>% group_by(GenLoc, HookNum) %>% summarise(numboc = sum(NumBoc), nhooks = length(catch),
+  cpue = numboc / nhooks) %>% as.data.frame %>% 
+ggplot(aes(x = HookNum, y = cpue)) + geom_point() + facet_wrap(~ GenLoc)
+
+#Does this relationship change over year? Probably not..  
+dat %>% group_by(Year, HookNum) %>% summarise(numboc = sum(NumBoc), nhooks = length(catch),
+  cpue = numboc / nhooks) %>% as.data.frame %>% 
+ggplot(aes(x = HookNum, y = cpue)) + geom_point() + facet_wrap(~ Year)
 
 
-
+#----------------------------------------------------------------------------------------------------
 
 
 
